@@ -79,9 +79,8 @@
     </div>
 
     <div class="col-md-6">
-      <label class="form-label">Website Path</label>
-      <input class="form-control" id="sig_webpath" placeholder="abc">
-      <small class="text-muted">Produces www.colorado.edu/abc</small>
+      <label class="form-label">Website</label>
+      <input class="form-control" id="sig_webpath" placeholder="https://www.colorado.edu">
     </div>
 
   </div>
@@ -155,8 +154,7 @@
     const mobile = escapeHtml(val("sig_mobile").trim());
     const fax    = escapeHtml(val("sig_fax").trim());
     const email = escapeHtml(val("sig_email").trim());
-    const webpathRaw = val("sig_webpath").trim().replace(/^\/+/, "");
-    const webpath = escapeHtml(webpathRaw);
+    const website = escapeHtml(val("sig_webpath").trim());
     const pronouns = escapeHtml(val("sig_pronouns").trim());
     // Create elements
     const logo =
@@ -178,11 +176,11 @@
       p11(dept ? `<span>${dept}</span>` : ""),
       p11(addTitle)
     ].filter(Boolean).join("");
-    const emailWebLine = (email || webpath)
+    const emailWebLine = (email || website)
       ? (
           `${email ? `<span style="color:#333; text-decoration:none;">${email}</span>` : ""}` +
-          `${email && webpath ? ` <span style="color:CFB87C;">&bull;</span> ` : ""}` +
-          `${webpath ? `<span style="color:#333; text-decoration:none;">www.colorado.edu/${webpath}</span>` : ""}`
+          `${email && website ? ` <span style="color:CFB87C;">&bull;</span> ` : ""}` +
+          `${website ? `<span style="color:#333; text-decoration:none;">${website}</span>` : ""}`
         )
       : "";
     const contact = [
