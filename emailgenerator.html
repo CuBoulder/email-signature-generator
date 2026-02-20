@@ -88,8 +88,8 @@
     <button class="ucb-link-button ucb-link-button-blue ucb-link-button-regular ucb-link-button-default"
             id="sig_generate" type="button">Generate</button>
 
-    <button class="ucb-link-button ucb-link-button-white ucb-link-button-regular ucb-link-button-default"
-            id="sig_copy_rendered" type="button">Copy signature</button>
+    <!-- <button class="ucb-link-button ucb-link-button-white ucb-link-button-regular ucb-link-button-default"
+            id="sig_copy_rendered" type="button">Copy signature</button> -->
 
     <span id="sig_copied" style="display:none; margin-left:10px;"><strong>Copied!</strong></span>
   </div>
@@ -193,9 +193,9 @@
         ? ""
         // Regular Logo
         : style === "logo1"
-          ? '<a href="https://www.colorado.edu"><img src="https://cuboulder.github.io/email-signature-generator/images/logo.png" width="510" height="95" alt="University of Colorado Boulder"></a>'
+          ? '<a href="https://www.colorado.edu"><img src="https://cuboulder.github.io/email-signature-generator/images/logo.png" width="255" height="47" alt="University of Colorado Boulder"></a>'
           // 150 years
-          : '<a href="https://www.colorado.edu/150"><img src="https://cuboulder.github.io/email-signature-generator/images/150-logo.png" width="720" height="180" alt="Celebrating 150 years at the University of Colorado Boulder"></a>';
+          : '<a href="https://www.colorado.edu/150"><img src="https://cuboulder.github.io/email-signature-generator/images/150-logo.png" width="360" height="90" alt="Celebrating 150 years at the University of Colorado Boulder"></a>';
     const identity = [
       name ? `
 <p style="font-family: Arial, Helvetica, sans-serif; font-size:13px; font-weight:bold; color:#333; margin:0; padding:0;">
@@ -266,51 +266,7 @@ function showCopied() {
   }, 1500);
 }
 
-async function copyToClipboard() {
-  render();
-
-  const el = $("sig_preview");
-  if (!el) return;
-
-  const html = el.innerHTML;
-  const plain = el.innerText;
-    // try 2 ways to copy
-  try {
-    if (navigator.clipboard && window.isSecureContext && window.ClipboardItem) {
-      const item = new ClipboardItem({
-        "text/html": new Blob([html], { type: "text/html" }),
-        "text/plain": new Blob([plain], { type: "text/plain" }),
-      });
-      await navigator.clipboard.write([item]);
-      showCopied();
-      return;
-    }
-  } catch (e) {
-    // fall through
-  }
-
-  selectPreviewContents();
-  try {
-    const ok = document.execCommand("copy");
-    if (!ok) throw new Error("copy blocked");
-    showCopied();
-  } catch (e) {
-    // keep selected so user can shortcut copy
-    const el = $("sig_copied");
-    if (el) {
-      el.style.display = "inline";
-      el.textContent = "Press Ctrl/Cmd+C";
-      clearTimeout(showCopied._t);
-      showCopied._t = setTimeout(() => {
-        el.style.display = "none";
-        el.textContent = "Copied!";
-      }, 2000);
-    }
-  }
-}
-
 $("sig_generate").addEventListener("click", render);
-$("sig_copy_rendered").addEventListener("click", copyToClipboard);
 
 // Click the preview to select all
 $("sig_preview").addEventListener("click", (e) => {
