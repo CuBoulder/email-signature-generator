@@ -1,5 +1,5 @@
 <!-- Email Generator DO NOT REMOVE-->
- <!-- Form -->
+<!-- Form -->
 <div class="container my-4 siggen">
   <h2>Email Signature Generator</h2>
   <div class="row g-3">
@@ -87,21 +87,46 @@
   <div class="mt-4 d-flex align-items-center gap-2 mb-2 flex-wrap">
     <button class="ucb-link-button ucb-link-button-blue ucb-link-button-regular ucb-link-button-default"
             id="sig_generate" type="button">Generate</button>
-
-    <button class="ucb-link-button ucb-link-button-white ucb-link-button-regular ucb-link-button-default"
-            id="sig_copy" type="button">Copy HTML</button>
-
-    <span id="sig_copied" style="display:none; margin-left:10px;"><strong>Copied!</strong></span>
   </div>
 
   <hr>
 
-  <label class="form-label">Generated HTML</label>
-  <textarea class="form-control mb-3" id="sig_output" rows="10"></textarea>
+  <label class="form-label">Signature</label>
 
-  <label class="form-label">Preview</label>
-  <div class="border rounded p-3 bg-light" id="sig_preview">&nbsp;</div>
+  <div id="sig_preview_wrap">
+    <div id="sig_preview">&nbsp;</div>
+  </div>
+
+  <p style="margin-top:8px;">
+    Click once anywhere on the text in the box below (avoid the linked text or image) to select all text inside the box.
+  </p>
+
 </div>
+<!-- Page Style DO NOT REMOVE -->
+<style>
+/* Fake box look */
+#sig_preview_wrap {
+  position: relative;
+  padding: 12px;
+}
+
+/* Using a pseudoelement so it doesn't get copied w/ the signature */
+#sig_preview_wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #f8f9fa;
+  z-index: 0;
+}
+
+#sig_preview {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+</style>
 
 <!-- JavaScript DO NOT REMOVE-->
 <script>
@@ -163,9 +188,9 @@
         ? ""
         // Regular Logo
         : style === "logo1"
-          ? '<a href="https://www.colorado.edu"><img src="https://cuboulder.github.io/email-signature-generator/images/logo.png" width="245" height="37" alt="University of Colorado Boulder"></a>'
+          ? '<a href="https://www.colorado.edu"><img src="https://cuboulder.github.io/email-signature-generator/images/logo.png" width="255" height="47" alt="University of Colorado Boulder"></a>'
           // 150 years
-          : '<a href="https://www.colorado.edu/150"><img src="https://cuboulder.github.io/email-signature-generator/images/150-logo.png" width="350" height="80" alt="Celebrating 150 years at the University of Colorado Boulder"></a>';
+          : '<a href="https://www.colorado.edu/150"><img src="https://cuboulder.github.io/email-signature-generator/images/150-logo.png" width="360" height="90" alt="Celebrating 150 years at the University of Colorado Boulder"></a>';
     const identity = [
       name ? `
 <p style="font-family: Arial, Helvetica, sans-serif; font-size:13px; font-weight:bold; color:#333; margin:0; padding:0;">
@@ -209,55 +234,45 @@ ${contactBlock}
 ${logo}`.trim();
 }
 
-//   Put in the signature
+// Put in the signature
   function render() {
     const html = buildSignatureHTML();
-    $("sig_output").value = html;
     $("sig_preview").innerHTML = html;
   }
-  function showCopied() {
-    const el = $("sig_copied");
-    if (!el) return;
-    el.style.display = "inline";
-    clearTimeout(showCopied._t);
-    showCopied._t = setTimeout(() => {
-      el.style.display = "none";
-    }, 1500);
-  }
-  async function copyToClipboard() {
-    render();
-    const ta = $("sig_output");
-    const text = ta.value;
-    // highlight
-    ta.focus();
-    ta.select();
-    ta.setSelectionRange(0, ta.value.length);
-    // try 2 ways to copy
-    try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(text);
-      } else {
-        const ok = document.execCommand("copy");
-        if (!ok) throw new Error("copy blocked");
-      }
-      showCopied();
-    } catch (e) {
-      // keep selected so user can shortcut copy
-      const el = $("sig_copied");
-      if (el) {
-        el.style.display = "inline";
-        el.textContent = "Press Ctrl/Cmd+C";
-        clearTimeout(showCopied._t);
-        showCopied._t = setTimeout(() => {
-          el.style.display = "none";
-          el.textContent = "Copied!";
-        }, 2000);
-      }
-    }
-  }
-  $("sig_generate").addEventListener("click", () => render());
-  $("sig_copy").addEventListener("click", () => copyToClipboard());
-  render();
+// If a user clicks, select all
+function selectPreviewContents() {
+  const el = $("sig_preview");
+  const sel = window.getSelection();
+  if (!el || !sel) return;
+
+  sel.removeAllRanges();
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  sel.addRange(range);
+}
+
+function showCopied() {
+  const el = $("sig_copied");
+  if (!el) return;
+  el.style.display = "inline";
+  clearTimeout(showCopied._t);
+  showCopied._t = setTimeout(() => {
+    el.style.display = "none";
+  }, 1500);
+}
+
+$("sig_generate").addEventListener("click", render);
+
+// Click the preview to select all
+$("sig_preview").addEventListener("click", (e) => {
+  const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : "";
+  if (tag === "a" || tag === "img") return; // avoid linked text or image!
+  selectPreviewContents();
+});
+
+// Init
+render();
+
 })();
 </script>
 <!-- END EMAIL GENERATOR -->
